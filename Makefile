@@ -21,10 +21,10 @@ all: libnew.(DYN_LIB_SUFFIX)
 
 libnew.(DYN_LIB_SUFFIX): libnew.cpp Makefile
 	$(CXX) $(CXXFLAGS) -c -o libnew.o libnew.cpp
-	$(CXX) $(LDFLAGS) $(DYN_LIB_COMMAND) -o libnew.$(DYN_LIB_SUFFIX) libnew.o
+	$(CXX) -o libnew.$(DYN_LIB_SUFFIX) libnew.o $(LDFLAGS) $(DYN_LIB_COMMAND)
 
 test-runner: libnew.(DYN_LIB_SUFFIX) Makefile
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test-runner test.cpp
+	$(CXX) $(CXXFLAGS) -o test-runner test.cpp $(LDFLAGS)
 
 test: test-runner 
 	$(PRELOADED) ./test-runner
