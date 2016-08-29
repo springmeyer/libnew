@@ -1,17 +1,21 @@
 OS := $(shell uname -s)
 
 CXXFLAGS=-O0 -DDEBUG -fPIC -std=c++11
-LDFLAGS=-Wl,-export_dynamic -std=c++11
+LDFLAGS=-std=c++11
+
+
 
 ifeq ($(OS), Linux)
   DYN_LIB_SUFFIX=so
   DYN_LIB_COMMAND=-shared
   PRELOADED=LD_PRELOAD=libnew.$(DYN_LIB_SUFFIX)
+  LDFLAGS+=-Wl,--export_dynamic
 endif
 ifeq ($(OS), Darwin)
   DYN_LIB_SUFFIX=dylib
   DYN_LIB_COMMAND=-dynamiclib
   PRELOADED=DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=libnew.$(DYN_LIB_SUFFIX)
+  LDFLAGS+=-Wl,-export_dynamic
 endif
 
 
