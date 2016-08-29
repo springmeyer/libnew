@@ -31,9 +31,10 @@ void atexit_handler()
  
 const int result_1 = std::atexit(atexit_handler);
 
-const int max_size_debug = std::stoi(std::getenv("LIBNEW_DEBUG_SIZE") ? std::getenv("LIBNEW_DEBUG_SIZE") : "0" );
-
-const int max_size_abort = std::stoi(std::getenv("LIBNEW_ABORT_SIZE") ? std::getenv("LIBNEW_ABORT_SIZE") : "0" );
+const int max_size_new_debug = std::stoi(std::getenv("NEW_DEBUG_SIZE") ? std::getenv("NEW_DEBUG_SIZE") : "0" );
+const int max_size_malloc_debug = std::stoi(std::getenv("MALLOC_DEBUG_SIZE") ? std::getenv("MALLOC_DEBUG_SIZE") : "0" );
+const int max_size_new_abort = std::stoi(std::getenv("NEW_ABORT_SIZE") ? std::getenv("NEW_ABORT_SIZE") : "0" );
+const int max_size_malloc_abort = std::stoi(std::getenv("MALLOC_ABORT_SIZE") ? std::getenv("MALLOC_ABORT_SIZE") : "0" );
 
 extern "C" {
 
@@ -52,6 +53,15 @@ void* malloc(size_t size)
     if (size > malloc_max) malloc_max = size;
     using callable_type = void * (*) (size_t);
     callable_type libc_malloc = reinterpret_cast<callable_type>(dlsym(RTLD_NEXT, "malloc"));
+    if (max_size_malloc_debug > 0  && size >= max_size_malloc_debug) {
+        std::fprintf(stderr, "malloc %lu %s %s:%d\n", size,__FUNCTION__, __FILE__, __LINE__);
+        void* callstack[128];
+        int i, frames = backtrace(callstack, 128);
+        backtrace_symbols_fd(callstack,frames,2);
+    }
+    if (max_size_malloc_abort > 0 && size >= max_size_malloc_abort) {
+        abort();
+    }
     return libc_malloc(size);
 }
 
@@ -72,13 +82,13 @@ void* operator new(std::size_t size) {
     if (p == 0) { // did malloc succeed?
         throw std::bad_alloc(); // ANSI/ISO compliant behavior
     }
-    if (max_size_debug > 0  && size >= max_size_debug) {
+    if (max_size_new_debug > 0  && size >= max_size_new_debug) {
         std::fprintf(stderr, "malloc %lu %s %s:%d\n", size,__FUNCTION__, __FILE__, __LINE__);
         void* callstack[128];
         int i, frames = backtrace(callstack, 128);
         backtrace_symbols_fd(callstack,frames,2);
     }
-    if (max_size_abort > 0 && size >= max_size_abort) {
+    if (max_size_new_abort > 0 && size >= max_size_new_abort) {
         abort();
     }
     return p;
