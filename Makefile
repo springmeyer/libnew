@@ -1,5 +1,8 @@
 OS := $(shell uname -s)
 
+CXXFLAGS=-O0 -DDEBUG -fPIC -std=c++11
+LDFLAGS=-Wl,-export_dynamic -std=c++11
+
 ifeq ($(OS), Linux)
   DYN_LIB_SUFFIX=so
   DYN_LIB_COMMAND=-shared
@@ -10,15 +13,19 @@ ifeq ($(OS), Darwin)
 endif
 
 
-all: libnew.dylib
+all: libnew.(DYN_LIB_SUFFIX)
 
-libnew.dylib: libnew.cpp Makefile
-	$(CXX) -O0 -DDEBUG -c -o libnew.o libnew.cpp -std=c++11
-	$(CXX) -Wl,-export_dynamic $(DYN_LIB_COMMAND) -o libnew.$(DYN_LIB_SUFFIX) libnew.o -std=c++11
+libnew.(DYN_LIB_SUFFIX): libnew.cpp Makefile
+	$(CXX) $(CXXFLAGS) -c -o libnew.o libnew.cpp
+	$(CXX) $(LDFLAGS) $(DYN_LIB_COMMAND) -o libnew.$(DYN_LIB_SUFFIX) libnew.o
 
-test: libnew.dylib Makefile
-	$(CXX) -o test test.cpp
-	DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=libnew.$(DYN_LIB_SUFFIX) ./test
+test-runner: libnew.(DYN_LIB_SUFFIX) Makefile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test-runner test.cpp
+
+test: test-runner 
+	DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=libnew.$(DYN_LIB_SUFFIX) ./test-runner
+
+test:
 
 clean:
 	rm -f *.o
