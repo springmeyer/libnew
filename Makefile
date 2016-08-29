@@ -7,13 +7,13 @@ LDFLAGS=-std=c++11
 
 ifeq ($(OS), Linux)
   DYN_LIB_SUFFIX=so
-  DYN_LIB_COMMAND=-shared -rdynamic
-  PRELOADED=LD_PRELOAD=libnew.$(DYN_LIB_SUFFIX)
+  DYN_LIB_COMMAND=-shared -rdynamic -ldl
+  PRELOADED=LD_PRELOAD=./libnew.$(DYN_LIB_SUFFIX)
 endif
 ifeq ($(OS), Darwin)
   DYN_LIB_SUFFIX=dylib
   DYN_LIB_COMMAND=-dynamiclib -Wl,-export_dynamic
-  PRELOADED=DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=libnew.$(DYN_LIB_SUFFIX)
+  PRELOADED=DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=./libnew.$(DYN_LIB_SUFFIX)
 endif
 
 
