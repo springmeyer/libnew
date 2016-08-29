@@ -9,7 +9,7 @@ ifeq ($(OS), Linux)
   DYN_LIB_SUFFIX=so
   DYN_LIB_COMMAND=-shared
   PRELOADED=LD_PRELOAD=libnew.$(DYN_LIB_SUFFIX)
-  LDFLAGS+=-Wl,--export_dynamic
+  LDFLAGS+=-Wl,-export_dynamic
 endif
 ifeq ($(OS), Darwin)
   DYN_LIB_SUFFIX=dylib
