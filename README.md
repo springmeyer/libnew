@@ -2,6 +2,8 @@
 
 Count allocations at runtime, print them at exit.
 
+[![Build Status](https://travis-ci.org/springmeyer/libnew.svg?branch=master)](https://travis-ci.org/springmeyer/libnew)
+
 ### Building
 
 ```
