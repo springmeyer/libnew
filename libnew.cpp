@@ -38,6 +38,9 @@ const int max_size_malloc_abort = std::stoi(std::getenv("MALLOC_ABORT_SIZE") ? s
 
 extern "C" {
 
+int get_new_count() { return new_count; }
+int get_malloc_count() { return malloc_count; }
+
 void* calloc(size_t num, size_t size)
 {
     ++calloc_count;
