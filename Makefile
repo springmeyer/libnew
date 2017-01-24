@@ -13,9 +13,10 @@ ifeq ($(OS), Linux)
 endif
 ifeq ($(OS), Darwin)
   DYN_LIB_SUFFIX=dylib
-  LIBDL_LINK=
+  LIBDL_LINK=-force_flat_namespace
   DYN_LIB_COMMAND=-dynamiclib -Wl,-export_dynamic
-  PRELOADED=DYLD_FORCE_FLAT_NAMESPACE=1 DYLD_INSERT_LIBRARIES=./libnew.$(DYN_LIB_SUFFIX)
+  # DYLD_FORCE_FLAT_NAMESPACE=1 causes hang on 10.12
+  PRELOADED=DYLD_INSERT_LIBRARIES=./libnew.$(DYN_LIB_SUFFIX)
 endif
 
 
