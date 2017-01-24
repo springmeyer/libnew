@@ -2,6 +2,7 @@
 #include <memory>
 #include <dlfcn.h>
 #include <cstdlib>
+#include "rss.hpp"
 
 int _new_count(void * handle) {
     using callable_type = int (*) ();
@@ -16,6 +17,7 @@ int _malloc_count(void * handle) {
     if (!libnew_get_malloc_count) throw std::runtime_error("get_malloc_count not found");
     return libnew_get_malloc_count();
 }
+
 
 std::string get_preload() {
     const char* ld_preload = std::getenv("LD_PRELOAD");
@@ -38,6 +40,7 @@ int main() {
 
         std::clog << "nc1: " << _new_count(handle) << "\n";
         std::clog << "mc1: " << _malloc_count(handle) << "\n";
+        memory_used();
         {
             std::clog << "long std::string\n";
             std::string s("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -45,6 +48,7 @@ int main() {
 
         std::clog << "nc2: " << _new_count(handle) << "\n";
         std::clog << "mc2: " << _malloc_count(handle) << "\n";
+        memory_used();
         {
             std::clog << "20 item unsigned int array\n";
             std::unique_ptr<unsigned int[]> out_row(new unsigned int[20]);
@@ -52,6 +56,7 @@ int main() {
 
         std::clog << "nc3: " << _new_count(handle) << "\n";
         std::clog << "mc3: " << _malloc_count(handle) << "\n";
+        memory_used();
         {
             std::clog << "direct malloc of unsigned int pointer\n";
             unsigned int *ptr_one = (unsigned int *)malloc(sizeof(unsigned int));
@@ -60,7 +65,7 @@ int main() {
 
         std::clog << "nc4: " << _new_count(handle) << "\n";
         std::clog << "mc4: " << _malloc_count(handle) << "\n";
-
+        memory_used();
         {
            int* p1 = (int*)std::calloc(4, sizeof(int));
            free(p1);
@@ -68,9 +73,11 @@ int main() {
 
         std::clog << "nc5: " << _new_count(handle) << "\n";
         std::clog << "mc5: " << _malloc_count(handle) << "\n";
+        memory_used();
     } catch (std::exception const& ex) {
         std::clog << "Error: " << ex.what() << "\n";
         return -1;
     }
+    memory_used();
     return 0;
 }

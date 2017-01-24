@@ -7,6 +7,7 @@
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <stdio.h>
+#include "rss.hpp"
 
 static std::size_t new_max = 0;
 static std::size_t new_total = 0;
@@ -44,6 +45,7 @@ void atexit_handler()
     std::clog << "  count:    " << calloc_count << "\n";
     std::clog << "  total:    " << calloc_total << "\n";
     std::clog << "  max:      " << calloc_max << "\n";
+    memory_used("final");
 }
  
 const int result_1 = std::atexit(atexit_handler);
